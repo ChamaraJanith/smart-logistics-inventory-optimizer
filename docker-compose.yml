@@ -1,0 +1,16 @@
+services:
+  db:
+    image: postgis/postgis:16-3.4
+    container_name: smart-logistics-db
+    restart: always
+    environment:
+      POSTGRES_DB: smart_logistics
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
