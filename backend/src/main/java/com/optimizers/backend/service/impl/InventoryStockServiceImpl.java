@@ -24,6 +24,7 @@ import com.optimizers.backend.repository.StockTransactionRepository;
 import com.optimizers.backend.repository.WarehouseRepository;
 import com.optimizers.backend.service.InventoryStockService;
 import com.optimizers.backend.service.ReorderAlertService;
+import com.optimizers.backend.service.AnomalyDetectionService;
 
 @Service
 public class InventoryStockServiceImpl implements InventoryStockService {
@@ -33,6 +34,7 @@ public class InventoryStockServiceImpl implements InventoryStockService {
     @Autowired private WarehouseRepository warehouseRepository;
     @Autowired private StockTransactionRepository transactionRepository;
     @Autowired private ReorderAlertService reorderAlertService;
+    @Autowired private AnomalyDetectionService anomalyDetectionService;
 
     @Override
     public InventoryStockResponseDTO createStock(InventoryStockRequestDTO requestDTO) {
@@ -149,6 +151,9 @@ public class InventoryStockServiceImpl implements InventoryStockService {
 
         // Check & trigger reorder alert if needed
         reorderAlertService.checkAndTriggerAlert(saved);
+
+        // Analyze for anomalies
+        anomalyDetectionService.analyzeStockTransaction(saved, txn);
 
         return mapToResponseDTO(saved);
     }
