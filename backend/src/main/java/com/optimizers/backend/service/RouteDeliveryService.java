@@ -3,6 +3,7 @@ package com.optimizers.backend.service;
 import java.util.List;
 
 import com.optimizers.backend.dto.request.RouteDeliveryRequestDTO;
+import com.optimizers.backend.dto.request.RouteDeliveryStatusUpdateDTO;
 import com.optimizers.backend.dto.response.RouteDeliveryResponseDTO;
 
 public interface RouteDeliveryService {
@@ -12,5 +13,6 @@ public interface RouteDeliveryService {
     List<RouteDeliveryResponseDTO> getByRouteId(Integer routeId);
     List<RouteDeliveryResponseDTO> getByDeliveryId(Integer deliveryId);
     RouteDeliveryResponseDTO update(Integer id, RouteDeliveryRequestDTO requestDTO);
+    RouteDeliveryResponseDTO updateStopStatus(Integer id, RouteDeliveryStatusUpdateDTO requestDTO);
     void delete(Integer id);
 }

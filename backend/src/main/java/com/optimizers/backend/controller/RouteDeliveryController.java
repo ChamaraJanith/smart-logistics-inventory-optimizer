@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.optimizers.backend.dto.request.RouteDeliveryRequestDTO;
+import com.optimizers.backend.dto.request.RouteDeliveryStatusUpdateDTO;
 import com.optimizers.backend.dto.response.RouteDeliveryResponseDTO;
 import com.optimizers.backend.service.RouteDeliveryService;
 
@@ -49,6 +51,12 @@ public class RouteDeliveryController {
     public ResponseEntity<List<RouteDeliveryResponseDTO>> getByRouteId(@PathVariable Integer routeId) {
         return ResponseEntity.ok(routeDeliveryService.getByRouteId(routeId));
     }
+    @PatchMapping("/{id}/status")
+public ResponseEntity<RouteDeliveryResponseDTO> updateStopStatus(
+        @PathVariable Integer id,
+        @Valid @RequestBody RouteDeliveryStatusUpdateDTO requestDTO) {
+    return ResponseEntity.ok(routeDeliveryService.updateStopStatus(id, requestDTO));
+}
 
     @GetMapping("/by-delivery/{deliveryId}")
     public ResponseEntity<List<RouteDeliveryResponseDTO>> getByDeliveryId(@PathVariable Integer deliveryId) {
