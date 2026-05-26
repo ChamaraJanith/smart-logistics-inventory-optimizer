@@ -8,12 +8,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.optimizers.backend.dto.request.RouteRequestDTO;
+import com.optimizers.backend.dto.response.RouteDeliveryDetailDTO;
 import com.optimizers.backend.dto.response.RouteResponseDTO;
+import com.optimizers.backend.dto.response.RouteSummaryDTO;
 import com.optimizers.backend.entity.Driver;
 import com.optimizers.backend.entity.Route;
+import com.optimizers.backend.entity.RouteDelivery;
 import com.optimizers.backend.entity.Vehicle;
 import com.optimizers.backend.exception.ResourceNotFoundException;
 import com.optimizers.backend.repository.DriverRepository;
+import com.optimizers.backend.repository.RouteDeliveryRepository;
 import com.optimizers.backend.repository.RouteRepository;
 import com.optimizers.backend.repository.VehicleRepository;
 import com.optimizers.backend.service.RouteService;
@@ -29,6 +33,9 @@ public class RouteServiceImpl implements RouteService {
 
     @Autowired
     private DriverRepository driverRepository;
+
+    @Autowired
+    private RouteDeliveryRepository routeDeliveryRepository;
 
     @Override
     public RouteResponseDTO createRoute(RouteRequestDTO requestDTO) {
@@ -86,6 +93,51 @@ public class RouteServiceImpl implements RouteService {
         routeRepository.delete(route);
     }
 
+    @Override
+    public RouteSummaryDTO getRouteSummary(Integer routeId) {
+        Route route = routeRepository.findById(routeId)
+                .orElseThrow(() -> new ResourceNotFoundException("Route not found with id: " + routeId));
+
+        List<RouteDelivery> routeDeliveries = routeDeliveryRepository
+                .findByRouteRouteIdOrderByStopSequenceAsc(routeId);
+
+        List<RouteDeliveryDetailDTO> deliveryDetails = routeDeliveries.stream()
+                .map(rd -> new RouteDeliveryDetailDTO(
+                        rd.getRouteDeliveryId(),
+                        rd.getDelivery().getDeliveryId(),
+                        rd.getStopSequence(),
+                        rd.getDelivery().getCustomerName(),
+                        rd.getDelivery().getContactNumber(),
+                        rd.getDelivery().getDeliveryAddress(),
+                        rd.getDelivery().getLatitude(),
+                        rd.getDelivery().getLongitude(),
+                        rd.getDelivery().getPackageWeight(),
+                        rd.getDelivery().getPackageVolume(),
+                        rd.getDelivery().getPriority(),
+                        rd.getPredictedEta(),
+                        rd.getEstimatedArrivalTime(),
+                        rd.getActualArrivalTime(),
+                        rd.getStopStatus()
+                ))
+                .collect(Collectors.toList());
+
+        Integer driverId = null;
+        if (route.getDriver() != null) {
+            driverId = route.getDriver().getDriverId();
+        }
+
+        return new RouteSummaryDTO(
+                route.getRouteId(),
+                route.getVehicle().getVehicleId(),
+                driverId,
+                route.getRouteDate(),
+                route.getStartLocation(),
+                route.getEndLocation(),
+                route.getRouteStatus(),
+                deliveryDetails
+        );
+    }
+
     private void mapToEntity(Route route, RouteRequestDTO requestDTO) {
         Vehicle vehicle = vehicleRepository.findById(requestDTO.getVehicleId())
                 .orElseThrow(() -> new ResourceNotFoundException("Vehicle not found with id: " + requestDTO.getVehicleId()));
@@ -95,6 +147,8 @@ public class RouteServiceImpl implements RouteService {
             Driver driver = driverRepository.findById(requestDTO.getDriverId())
                     .orElseThrow(() -> new ResourceNotFoundException("Driver not found with id: " + requestDTO.getDriverId()));
             route.setDriver(driver);
+        } else {
+            route.setDriver(null);
         }
 
         route.setRouteDate(requestDTO.getRouteDate());

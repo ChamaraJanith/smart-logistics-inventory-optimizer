@@ -7,19 +7,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.optimizers.backend.dto.request.RouteRequestDTO;
 import com.optimizers.backend.dto.response.RouteResponseDTO;
+import com.optimizers.backend.dto.response.RouteSummaryDTO;
 import com.optimizers.backend.service.RouteService;
 
 import jakarta.validation.Valid;
@@ -34,13 +26,7 @@ public class RouteController {
 
     @PostMapping
     public ResponseEntity<RouteResponseDTO> createRoute(@Valid @RequestBody RouteRequestDTO requestDTO) {
-        RouteResponseDTO response = routeService.createRoute(requestDTO);
-        return new ResponseEntity<>(response, HttpStatus.CREATED);
-    }
-
-    @GetMapping
-    public ResponseEntity<List<RouteResponseDTO>> getAllRoutes() {
-        return ResponseEntity.ok(routeService.getAllRoutes());
+        return new ResponseEntity<>(routeService.createRoute(requestDTO), HttpStatus.CREATED);
     }
 
     @GetMapping("/{id}")
@@ -48,15 +34,25 @@ public class RouteController {
         return ResponseEntity.ok(routeService.getRouteById(id));
     }
 
-    @GetMapping("/by-date")
-    public ResponseEntity<List<RouteResponseDTO>> getRoutesByDate(
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
-        return ResponseEntity.ok(routeService.getRoutesByDate(date));
+    @GetMapping
+    public ResponseEntity<List<RouteResponseDTO>> getAllRoutes() {
+        return ResponseEntity.ok(routeService.getAllRoutes());
     }
 
-    @GetMapping("/by-status")
-    public ResponseEntity<List<RouteResponseDTO>> getRoutesByStatus(@RequestParam String status) {
+    @GetMapping("/date/{routeDate}")
+    public ResponseEntity<List<RouteResponseDTO>> getRoutesByDate(
+            @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate routeDate) {
+        return ResponseEntity.ok(routeService.getRoutesByDate(routeDate));
+    }
+
+    @GetMapping("/status/{status}")
+    public ResponseEntity<List<RouteResponseDTO>> getRoutesByStatus(@PathVariable String status) {
         return ResponseEntity.ok(routeService.getRoutesByStatus(status));
+    }
+
+    @GetMapping("/{id}/summary")
+    public ResponseEntity<RouteSummaryDTO> getRouteSummary(@PathVariable Integer id) {
+        return ResponseEntity.ok(routeService.getRouteSummary(id));
     }
 
     @PutMapping("/{id}")

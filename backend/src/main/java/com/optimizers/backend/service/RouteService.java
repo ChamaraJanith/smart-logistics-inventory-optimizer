@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.optimizers.backend.dto.request.RouteRequestDTO;
 import com.optimizers.backend.dto.response.RouteResponseDTO;
+import com.optimizers.backend.dto.response.RouteSummaryDTO;
 
 public interface RouteService {
     RouteResponseDTO createRoute(RouteRequestDTO requestDTO);
@@ -14,4 +15,5 @@ public interface RouteService {
     List<RouteResponseDTO> getRoutesByStatus(String status);
     RouteResponseDTO updateRoute(Integer id, RouteRequestDTO requestDTO);
     void deleteRoute(Integer id);
+    RouteSummaryDTO getRouteSummary(Integer routeId);
 }
