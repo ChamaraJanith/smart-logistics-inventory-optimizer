@@ -7,8 +7,8 @@ import com.optimizers.backend.dto.response.DriverResponseDTO;
 
 public interface DriverService {
     DriverResponseDTO createDriver(DriverRequestDTO requestDTO);
-    DriverResponseDTO getDriverById(Long id);
+    DriverResponseDTO getDriverById(Integer id);
     List<DriverResponseDTO> getAllDrivers();
-    DriverResponseDTO updateDriver(Long id, DriverRequestDTO requestDTO);
-    void deleteDriver(Long id);
+    DriverResponseDTO updateDriver(Integer id, DriverRequestDTO requestDTO);
+    void deleteDriver(Integer id);
 }

@@ -1,16 +1,17 @@
 package com.optimizers.backend.service.impl;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import com.optimizers.backend.dto.request.VehicleRequestDTO;
 import com.optimizers.backend.dto.response.VehicleResponseDTO;
 import com.optimizers.backend.entity.Vehicle;
 import com.optimizers.backend.exception.ResourceNotFoundException;
 import com.optimizers.backend.repository.VehicleRepository;
 import com.optimizers.backend.service.VehicleService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class VehicleServiceImpl implements VehicleService {
@@ -35,7 +36,7 @@ public class VehicleServiceImpl implements VehicleService {
     }
 
     @Override
-    public VehicleResponseDTO getVehicleById(Long id) {
+    public VehicleResponseDTO getVehicleById(Integer id) {
         Vehicle vehicle = vehicleRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Vehicle not found with id: " + id));
         return mapToResponseDTO(vehicle);
@@ -50,7 +51,7 @@ public class VehicleServiceImpl implements VehicleService {
     }
 
     @Override
-    public VehicleResponseDTO updateVehicle(Long id, VehicleRequestDTO requestDTO) {
+    public VehicleResponseDTO updateVehicle(Integer id, VehicleRequestDTO requestDTO) {
         Vehicle vehicle = vehicleRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Vehicle not found with id: " + id));
 
@@ -68,7 +69,7 @@ public class VehicleServiceImpl implements VehicleService {
     }
 
     @Override
-    public void deleteVehicle(Long id) {
+    public void deleteVehicle(Integer id) {
         Vehicle vehicle = vehicleRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Vehicle not found with id: " + id));
         vehicleRepository.delete(vehicle);

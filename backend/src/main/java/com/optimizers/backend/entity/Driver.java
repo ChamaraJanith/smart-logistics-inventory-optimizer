@@ -19,7 +19,7 @@ public class Driver {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "driver_id")
-    private Long driverId;
+    private Integer driverId;
 
     @Column(name = "driver_name", nullable = false, length = 100)
     private String driverName;
@@ -43,7 +43,7 @@ public class Driver {
     public Driver() {
     }
 
-    public Driver(Long driverId, String driverName, String phone, String licenseNo,
+    public Driver(Integer driverId, String driverName, String phone, String licenseNo,
                   String status, Vehicle vehicle, LocalDateTime createdAt) {
         this.driverId = driverId;
         this.driverName = driverName;
@@ -54,11 +54,11 @@ public class Driver {
         this.createdAt = createdAt;
     }
 
-    public Long getDriverId() {
+    public Integer getDriverId() {
         return driverId;
     }
 
-    public void setDriverId(Long driverId) {
+    public void setDriverId(Integer driverId) {
         this.driverId = driverId;
     }
 

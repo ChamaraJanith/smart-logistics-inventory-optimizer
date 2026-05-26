@@ -7,8 +7,8 @@ import com.optimizers.backend.dto.response.VehicleResponseDTO;
 
 public interface VehicleService {
     VehicleResponseDTO createVehicle(VehicleRequestDTO requestDTO);
-    VehicleResponseDTO getVehicleById(Long id);
+    VehicleResponseDTO getVehicleById(Integer id);
     List<VehicleResponseDTO> getAllVehicles();
-    VehicleResponseDTO updateVehicle(Long id, VehicleRequestDTO requestDTO);
-    void deleteVehicle(Long id);
+    VehicleResponseDTO updateVehicle(Integer id, VehicleRequestDTO requestDTO);
+    void deleteVehicle(Integer id);
 }

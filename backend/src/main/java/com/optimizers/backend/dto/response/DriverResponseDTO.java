@@ -3,20 +3,20 @@ package com.optimizers.backend.dto.response;
 import java.time.LocalDateTime;
 
 public class DriverResponseDTO {
-    private Long driverId;
+    private Integer driverId;
     private String driverName;
     private String phone;
     private String licenseNo;
     private String status;
-    private Long vehicleId;
+    private Integer vehicleId;
     private String vehicleNumber;
     private LocalDateTime createdAt;
 
     public DriverResponseDTO() {
     }
 
-    public DriverResponseDTO(Long driverId, String driverName, String phone, String licenseNo,
-                             String status, Long vehicleId, String vehicleNumber, LocalDateTime createdAt) {
+    public DriverResponseDTO(Integer driverId, String driverName, String phone, String licenseNo,
+                             String status, Integer vehicleId, String vehicleNumber, LocalDateTime createdAt) {
         this.driverId = driverId;
         this.driverName = driverName;
         this.phone = phone;
@@ -27,11 +27,11 @@ public class DriverResponseDTO {
         this.createdAt = createdAt;
     }
 
-    public Long getDriverId() {
+    public Integer getDriverId() {
         return driverId;
     }
 
-    public void setDriverId(Long driverId) {
+    public void setDriverId(Integer driverId) {
         this.driverId = driverId;
     }
 
@@ -67,11 +67,11 @@ public class DriverResponseDTO {
         this.status = status;
     }
 
-    public Long getVehicleId() {
+    public Integer getVehicleId() {
         return vehicleId;
     }
 
-    public void setVehicleId(Long vehicleId) {
+    public void setVehicleId(Integer vehicleId) {
         this.vehicleId = vehicleId;
     }
 

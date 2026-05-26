@@ -43,7 +43,7 @@ public class DriverServiceImpl implements DriverService {
     }
 
     @Override
-    public DriverResponseDTO getDriverById(Long id) {
+    public DriverResponseDTO getDriverById(Integer id) {
         Driver driver = driverRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Driver not found with id: " + id));
         return mapToResponseDTO(driver);
@@ -58,7 +58,7 @@ public class DriverServiceImpl implements DriverService {
     }
 
     @Override
-    public DriverResponseDTO updateDriver(Long id, DriverRequestDTO requestDTO) {
+    public DriverResponseDTO updateDriver(Integer id, DriverRequestDTO requestDTO) {
         Driver driver = driverRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Driver not found with id: " + id));
 
@@ -80,14 +80,14 @@ public class DriverServiceImpl implements DriverService {
     }
 
     @Override
-    public void deleteDriver(Long id) {
+    public void deleteDriver(Integer id) {
         Driver driver = driverRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Driver not found with id: " + id));
         driverRepository.delete(driver);
     }
 
     private DriverResponseDTO mapToResponseDTO(Driver driver) {
-        Long vehicleId = null;
+        Integer vehicleId = null;
         String vehicleNumber = null;
 
         if (driver.getVehicle() != null) {

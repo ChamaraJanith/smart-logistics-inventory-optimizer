@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 public class VehicleResponseDTO {
-    private Long vehicleId;
+    private Integer vehicleId;
     private String vehicleNumber;
     private String vehicleType;
     private BigDecimal capacityKg;
@@ -18,7 +18,7 @@ public class VehicleResponseDTO {
     public VehicleResponseDTO() {
     }
 
-    public VehicleResponseDTO(Long vehicleId, String vehicleNumber, String vehicleType,
+    public VehicleResponseDTO(Integer vehicleId, String vehicleNumber, String vehicleType,
                               BigDecimal capacityKg, BigDecimal maxVolume, String fuelType,
                               String currentStatus, BigDecimal currentLatitude,
                               BigDecimal currentLongitude, LocalDateTime createdAt) {
@@ -34,11 +34,11 @@ public class VehicleResponseDTO {
         this.createdAt = createdAt;
     }
 
-    public Long getVehicleId() {
+    public Integer getVehicleId() {
         return vehicleId;
     }
 
-    public void setVehicleId(Long vehicleId) {
+    public void setVehicleId(Integer vehicleId) {
         this.vehicleId = vehicleId;
     }
 
