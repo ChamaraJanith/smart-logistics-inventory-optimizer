@@ -38,4 +38,19 @@ public interface DeliveryRepository extends JpaRepository<Delivery, Integer> {
                    "ORDER BY EXTRACT(YEAR FROM created_at) DESC, EXTRACT(MONTH FROM created_at) DESC",
            nativeQuery = true)
     List<Object[]> findMonthlyDeliveryCounts(@Param("startDate") LocalDateTime startDate);
+
+    @Query(value = "SELECT delivery_id, customer_name, latitude, longitude, status, delivery_address " +
+               "FROM delivery " +
+               "WHERE latitude IS NOT NULL AND longitude IS NOT NULL " +
+               "ORDER BY status",
+       nativeQuery = true)
+List<Object[]> findAllDeliveryLocations();
+
+@Query(value = "SELECT delivery_id, customer_name, latitude, longitude, status, delivery_address " +
+               "FROM delivery " +
+               "WHERE latitude IS NOT NULL AND longitude IS NOT NULL " +
+               "AND status = :status " +
+               "ORDER BY delivery_id",
+       nativeQuery = true)
+List<Object[]> findDeliveryLocationsByStatus(@Param("status") String status);
 }
