@@ -21,6 +21,7 @@ public class ReorderAlertResponseDTO {
     private String status;
     private LocalDateTime triggeredAt;
     private LocalDateTime resolvedAt;
+    private BigDecimal predictedDemand7d;
 
     public ReorderAlertResponseDTO() {}
 
@@ -68,4 +69,9 @@ public class ReorderAlertResponseDTO {
 
     public LocalDateTime getResolvedAt() { return resolvedAt; }
     public void setResolvedAt(LocalDateTime resolvedAt) { this.resolvedAt = resolvedAt; }
+
+    public BigDecimal getPredictedDemand7d() { return predictedDemand7d; }
+    public void setPredictedDemand7d(BigDecimal v) { this.predictedDemand7d = v; }
+
+    
 }

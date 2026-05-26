@@ -16,12 +16,16 @@ import com.optimizers.backend.entity.ReorderAlert;
 import com.optimizers.backend.exception.ResourceNotFoundException;
 import com.optimizers.backend.repository.ReorderAlertRepository;
 import com.optimizers.backend.service.ReorderAlertService;
+import com.optimizers.backend.service.DemandForecastService;
 
 @Service
 public class ReorderAlertServiceImpl implements ReorderAlertService {
 
     @Autowired
     private ReorderAlertRepository alertRepository;
+
+    @Autowired
+    private DemandForecastService demandForecastService;
 
     @Override
     public void checkAndTriggerAlert(InventoryStock stock) {
@@ -50,6 +54,11 @@ public class ReorderAlertServiceImpl implements ReorderAlertService {
             alertRepository.save(existing.get());
             return;
         }
+        
+        // Get predicted demand for next 7 days
+        BigDecimal predicted7d = demandForecastService.getPredictedDemand7d(
+        stock.getItem().getItemId(),
+        stock.getWarehouse().getWarehouseId());
 
         // Create new alert
         ReorderAlert alert = new ReorderAlert();
@@ -59,6 +68,8 @@ public class ReorderAlertServiceImpl implements ReorderAlertService {
         alert.setCurrentStock(available);
         alert.setReorderLevel(stock.getReorderLevel());
         alert.setSuggestedReorderQty(stock.getReorderQuantity());
+        // Add AI predicted demand
+        alert.setPredictedDemand7d(predicted7d);
         alert.setSeverity(determineSeverity(stock));
         alert.setAlertType(available.compareTo(BigDecimal.ZERO) <= 0 ? "OUT_OF_STOCK" : "LOW_STOCK");
         alert.setStatus("OPEN");
@@ -117,6 +128,7 @@ public class ReorderAlertServiceImpl implements ReorderAlertService {
         dto.setStatus(alert.getStatus());
         dto.setTriggeredAt(alert.getTriggeredAt());
         dto.setResolvedAt(alert.getResolvedAt());
+        dto.setPredictedDemand7d(alert.getPredictedDemand7d());
         return dto;
     }
 }
