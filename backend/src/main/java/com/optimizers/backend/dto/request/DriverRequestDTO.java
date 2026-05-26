@@ -13,12 +13,12 @@ public class DriverRequestDTO {
     private String licenseNo;
 
     private String status;
-    private Long vehicleId;
+    private Integer vehicleId;
 
     public DriverRequestDTO() {
     }
 
-    public DriverRequestDTO(String driverName, String phone, String licenseNo, String status, Long vehicleId) {
+    public DriverRequestDTO(String driverName, String phone, String licenseNo, String status, Integer vehicleId) {
         this.driverName = driverName;
         this.phone = phone;
         this.licenseNo = licenseNo;
@@ -58,11 +58,11 @@ public class DriverRequestDTO {
         this.status = status;
     }
 
-    public Long getVehicleId() {
+    public Integer getVehicleId() {
         return vehicleId;
     }
 
-    public void setVehicleId(Long vehicleId) {
+    public void setVehicleId(Integer vehicleId) {
         this.vehicleId = vehicleId;
     }
 }

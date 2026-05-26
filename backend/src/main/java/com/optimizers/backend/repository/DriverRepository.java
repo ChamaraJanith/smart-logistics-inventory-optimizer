@@ -4,5 +4,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.optimizers.backend.entity.Driver;
 
-public interface DriverRepository extends JpaRepository<Driver, Long> {
+public interface DriverRepository extends JpaRepository<Driver, Integer> {
 }

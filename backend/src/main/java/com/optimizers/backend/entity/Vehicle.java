@@ -18,7 +18,7 @@ public class Vehicle {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "vehicle_id")
-    private Long vehicleId;
+    private Integer vehicleId;
 
     @Column(name = "vehicle_number", nullable = false, unique = true, length = 50)
     private String vehicleNumber;
@@ -50,7 +50,7 @@ public class Vehicle {
     public Vehicle() {
     }
 
-    public Vehicle(Long vehicleId, String vehicleNumber, String vehicleType, BigDecimal capacityKg,
+    public Vehicle(Integer vehicleId, String vehicleNumber, String vehicleType, BigDecimal capacityKg,
                    BigDecimal maxVolume, String fuelType, String currentStatus,
                    BigDecimal currentLatitude, BigDecimal currentLongitude, LocalDateTime createdAt) {
         this.vehicleId = vehicleId;
@@ -65,11 +65,11 @@ public class Vehicle {
         this.createdAt = createdAt;
     }
 
-    public Long getVehicleId() {
+    public Integer getVehicleId() {
         return vehicleId;
     }
 
-    public void setVehicleId(Long vehicleId) {
+    public void setVehicleId(Integer vehicleId) {
         this.vehicleId = vehicleId;
     }
 

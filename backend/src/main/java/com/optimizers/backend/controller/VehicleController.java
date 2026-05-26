@@ -40,21 +40,21 @@ public class VehicleController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<VehicleResponseDTO> getVehicleById(@PathVariable Long id) {
+    public ResponseEntity<VehicleResponseDTO> getVehicleById(@PathVariable Integer id) {
         VehicleResponseDTO response = vehicleService.getVehicleById(id);
         return ResponseEntity.ok(response);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<VehicleResponseDTO> updateVehicle(
-            @PathVariable Long id,
+            @PathVariable Integer id,
             @RequestBody VehicleRequestDTO requestDTO) {
         VehicleResponseDTO response = vehicleService.updateVehicle(id, requestDTO);
         return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteVehicle(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteVehicle(@PathVariable Integer id) {
         vehicleService.deleteVehicle(id);
         return ResponseEntity.noContent().build();
     }

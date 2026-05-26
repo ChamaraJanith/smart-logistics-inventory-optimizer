@@ -15,46 +15,46 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.optimizers.backend.dto.request.DriverRequestDTO;
-import com.optimizers.backend.dto.response.DriverResponseDTO;
-import com.optimizers.backend.service.DriverService;
+import com.optimizers.backend.dto.request.DeliveryRequestDTO;
+import com.optimizers.backend.dto.response.DeliveryResponseDTO;
+import com.optimizers.backend.service.DeliveryService;
 
 import jakarta.validation.Valid;
 
 @RestController
-@RequestMapping("/api/v1/drivers")
+@RequestMapping("/api/v1/deliveries")
 @CrossOrigin(origins = "*")
-public class DriverController {
+public class DeliveryController {
 
     @Autowired
-    private DriverService driverService;
+    private DeliveryService deliveryService;
 
     @PostMapping
-    public ResponseEntity<DriverResponseDTO> createDriver(@Valid @RequestBody DriverRequestDTO requestDTO) {
-        DriverResponseDTO response = driverService.createDriver(requestDTO);
+    public ResponseEntity<DeliveryResponseDTO> createDelivery(@Valid @RequestBody DeliveryRequestDTO requestDTO) {
+        DeliveryResponseDTO response = deliveryService.createDelivery(requestDTO);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
     @GetMapping
-    public ResponseEntity<List<DriverResponseDTO>> getAllDrivers() {
-        return ResponseEntity.ok(driverService.getAllDrivers());
+    public ResponseEntity<List<DeliveryResponseDTO>> getAllDeliveries() {
+        return ResponseEntity.ok(deliveryService.getAllDeliveries());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<DriverResponseDTO> getDriverById(@PathVariable Integer id) {
-        return ResponseEntity.ok(driverService.getDriverById(id));
+    public ResponseEntity<DeliveryResponseDTO> getDeliveryById(@PathVariable Integer id) {
+        return ResponseEntity.ok(deliveryService.getDeliveryById(id));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<DriverResponseDTO> updateDriver(
+    public ResponseEntity<DeliveryResponseDTO> updateDelivery(
             @PathVariable Integer id,
-            @Valid @RequestBody DriverRequestDTO requestDTO) {
-        return ResponseEntity.ok(driverService.updateDriver(id, requestDTO));
+            @Valid @RequestBody DeliveryRequestDTO requestDTO) {
+        return ResponseEntity.ok(deliveryService.updateDelivery(id, requestDTO));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteDriver(@PathVariable Integer id) {
-        driverService.deleteDriver(id);
+    public ResponseEntity<Void> deleteDelivery(@PathVariable Integer id) {
+        deliveryService.deleteDelivery(id);
         return ResponseEntity.noContent().build();
     }
 }
