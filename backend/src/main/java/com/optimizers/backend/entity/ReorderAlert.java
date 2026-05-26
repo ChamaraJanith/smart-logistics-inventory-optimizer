@@ -9,7 +9,6 @@ import jakarta.persistence.*;
 @Entity
 @Table(name = "reorder_alert")
 public class ReorderAlert {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "alert_id")
@@ -53,6 +52,9 @@ public class ReorderAlert {
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
+
+    @Column(name = "predicted_demand_7d", precision = 12, scale = 3)
+    private BigDecimal predictedDemand7d;
 
     public ReorderAlert() {}
 
@@ -101,4 +103,7 @@ public class ReorderAlert {
 
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+
+    public BigDecimal getPredictedDemand7d() { return predictedDemand7d; }
+    public void setPredictedDemand7d(BigDecimal predictedDemand7d) {this.predictedDemand7d = predictedDemand7d;}
 }
