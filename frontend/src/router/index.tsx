@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import LandingPage from '../pages/LandingPage'
 import AppLayout from '../components/layout/AppLayout'
 import DashboardPage from '../pages/dashboard/DashboardPage'
+import DeliveriesPage from '../pages/deliveries/DeliveriesPage'
 
 export default function Router() {
   return (
@@ -12,7 +13,7 @@ export default function Router() {
         <Route path="/app" element={<AppLayout />}>
           <Route index element={<Navigate to="dashboard" replace />} />
           <Route path="dashboard" element={<DashboardPage />} />
-          <Route path="deliveries" element={<div style={{padding:20}}>Deliveries page (todo)</div>} />
+          <Route path="deliveries" element={<DeliveriesPage />} />
           <Route path="routes" element={<div style={{padding:20}}>Routes page (todo)</div>} />
           <Route path="drivers" element={<div style={{padding:20}}>Drivers page (todo)</div>} />
           <Route path="vehicles" element={<div style={{padding:20}}>Vehicles page (todo)</div>} />
