@@ -25,4 +25,46 @@ public interface InventoryStockRepository extends JpaRepository<InventoryStock, 
     @Query("SELECT s FROM InventoryStock s WHERE s.warehouse.warehouseId = :warehouseId " +
            "AND s.availableQuantity <= s.reorderLevel AND s.item.status = 'ACTIVE'")
     List<InventoryStock> findLowStockByWarehouse(@Param("warehouseId") Integer warehouseId);
+
+       // Count out of stock items (available <= 0)
+       @Query("SELECT COUNT(s) FROM InventoryStock s " +
+              "WHERE s.availableQuantity <= 0 " +
+              "AND s.item.status = 'ACTIVE'")
+       long countOutOfStockItems();
+
+       // Count out of stock by warehouse
+       @Query("SELECT COUNT(s) FROM InventoryStock s " +
+              "WHERE s.warehouse.warehouseId = :warehouseId " +
+              "AND s.availableQuantity <= 0 " +
+              "AND s.item.status = 'ACTIVE'")
+       long countOutOfStockByWarehouse(
+              @Param("warehouseId") Integer warehouseId);
+
+       // Count low stock by warehouse
+       @Query("SELECT COUNT(s) FROM InventoryStock s " +
+              "WHERE s.warehouse.warehouseId = :warehouseId " +
+              "AND s.availableQuantity <= s.reorderLevel " +
+              "AND s.availableQuantity > 0 " +
+              "AND s.item.status = 'ACTIVE'")
+       long countLowStockByWarehouse(
+              @Param("warehouseId") Integer warehouseId);
+
+       // Count critical stock by warehouse (available <= reorderLevel * 0.5)
+       @Query("SELECT COUNT(s) FROM InventoryStock s " +
+              "WHERE s.warehouse.warehouseId = :warehouseId " +
+              "AND s.availableQuantity <= (s.reorderLevel * 0.5) " +
+              "AND s.availableQuantity > 0 " +
+              "AND s.item.status = 'ACTIVE'")
+       long countCriticalStockByWarehouse(
+              @Param("warehouseId") Integer warehouseId);
+
+       // Count normal stock by warehouse
+       @Query("SELECT COUNT(s) FROM InventoryStock s " +
+              "WHERE s.warehouse.warehouseId = :warehouseId " +
+              "AND s.availableQuantity > s.reorderLevel " +
+              "AND s.item.status = 'ACTIVE'")
+       long countNormalStockByWarehouse(
+              @Param("warehouseId") Integer warehouseId);
+
+
 }

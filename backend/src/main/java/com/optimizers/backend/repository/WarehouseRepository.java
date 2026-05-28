@@ -8,4 +8,7 @@ import com.optimizers.backend.entity.Warehouse;
 
 public interface WarehouseRepository extends JpaRepository<Warehouse, Integer> {
     List<Warehouse> findByStatus(String status);
+
+    // Count active warehouses
+    long countByStatus(String status);
 }

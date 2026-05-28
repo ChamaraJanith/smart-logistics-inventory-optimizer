@@ -14,4 +14,19 @@ public interface ReorderAlertRepository extends JpaRepository<ReorderAlert, Inte
     List<ReorderAlert> findBySeverityAndStatus(String severity, String status);
     // Check if open alert already exists for this stock
     Optional<ReorderAlert> findByStock_StockIdAndStatus(Integer stockId, String status);
+
+
+    // Count open alerts
+    long countByStatus(String status);
+
+    // Count by severity and status
+    long countBySeverityAndStatus(String severity, String status);
+
+    // Count open alerts by warehouse
+    long countByWarehouse_WarehouseIdAndStatus(
+            Integer warehouseId, String status);
+
+    // Recent 5 open alerts
+    List<ReorderAlert> findTop5ByStatusOrderByTriggeredAtDesc(
+            String status);
 }
