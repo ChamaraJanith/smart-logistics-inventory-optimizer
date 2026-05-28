@@ -1,20 +1,20 @@
-/* Routes page styles aligned with professional dark theme */
+/* Vehicles page styles aligned with professional dark theme */
 @import './landing.css';
 
-.routes-page {
+.vehicles-page {
   padding: 32px 40px;
   color: var(--app-text);
   min-height: 100vh;
 }
 
-.routes-header {
+.vehicles-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 32px;
 }
 
-.routes-header h2 {
+.vehicles-header h2 {
   font-size: 32px;
   font-weight: 700;
   letter-spacing: -0.5px;
@@ -25,13 +25,9 @@
   margin: 0;
 }
 
-.routes-actions {
+.vehicles-actions {
   display: flex;
   gap: 12px;
-}
-
-.map-tiles {
-  filter: brightness(0.6) invert(1) contrast(3) hue-rotate(200deg) saturate(0.3) brightness(0.7);
 }
 
 .table-container {
@@ -137,7 +133,7 @@
 }
 
 @media (max-width: 1024px) {
-  .routes-page {
+  .vehicles-page {
     padding: 24px 20px;
   }
 }

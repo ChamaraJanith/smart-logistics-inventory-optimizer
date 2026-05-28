@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import '../../styles/dashboard.css'
 import DeliveryTrendsChart, { DriverPerformanceChart } from '../../components/dashboard/Charts'
+import DashboardLiveMap from '../../components/dashboard/DashboardLiveMap'
 
 async function safeJsonFetch(url: string) {
   const res = await fetch(url)
