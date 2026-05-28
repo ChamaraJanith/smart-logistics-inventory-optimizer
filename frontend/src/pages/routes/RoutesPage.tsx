@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import '../../styles/routes.css'
+import RouteMap from '../../components/map/RouteMap'
 
 interface RouteItem {
   routeId: number;
@@ -24,6 +25,8 @@ export default function RoutesPage() {
   const [routes, setRoutes] = useState<RouteItem[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+
+  const [selectedRoute, setSelectedRoute] = useState<RouteItem | null>(null)
 
   // Modal states
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -161,7 +164,9 @@ export default function RoutesPage() {
         </div>
       </div>
 
-      <div className="table-container">
+      <RouteMap routeId={selectedRoute?.routeId} />
+
+      <div className="table-container" style={{ marginTop: '24px' }}>
         {loading && <div className="empty-state">Loading routes...</div>}
         {error && <div className="empty-state" style={{ color: 'var(--app-error)' }}>{error}</div>}
         
@@ -187,7 +192,15 @@ export default function RoutesPage() {
                 </tr>
               ) : (
                 routes.map(r => (
-                  <tr key={r.routeId}>
+                  <tr 
+                    key={r.routeId} 
+                    onClick={() => setSelectedRoute(r)}
+                    style={{ 
+                      cursor: 'pointer',
+                      background: selectedRoute?.routeId === r.routeId ? 'rgba(255, 255, 255, 0.05)' : undefined,
+                      borderLeft: selectedRoute?.routeId === r.routeId ? '3px solid var(--app-blue)' : '3px solid transparent'
+                    }}
+                  >
                     <td style={{ fontWeight: 600, color: 'var(--app-blue)' }}>#{r.routeId}</td>
                     <td>
                       <div>Vehicle ID: {r.vehicleId} {r.vehicleNumber && `(${r.vehicleNumber})`}</div>
@@ -210,8 +223,8 @@ export default function RoutesPage() {
                     </td>
                     <td>{r.routeDate}</td>
                     <td>
-                      <button className="action-btn" title="Edit route" onClick={() => openEditModal(r)}>✏️</button>
-                      <button className="action-btn" title="Delete route" onClick={() => handleDelete(r.routeId)}>🗑️</button>
+                      <button className="action-btn" title="Edit route" onClick={(e) => { e.stopPropagation(); openEditModal(r); }}>✏️</button>
+                      <button className="action-btn" title="Delete route" onClick={(e) => { e.stopPropagation(); handleDelete(r.routeId); }}>🗑️</button>
                     </td>
                   </tr>
                 ))

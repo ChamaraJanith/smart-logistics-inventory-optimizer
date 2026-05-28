@@ -4,6 +4,8 @@ import AppLayout from '../components/layout/AppLayout'
 import DashboardPage from '../pages/dashboard/DashboardPage'
 import DeliveriesPage from '../pages/deliveries/DeliveriesPage'
 import RoutesPage from '../pages/routes/RoutesPage'
+import DriversPage from '../pages/drivers/DriversPage'
+import VehiclesPage from '../pages/vehicles/VehiclesPage'
 
 export default function Router() {
   return (
@@ -16,8 +18,8 @@ export default function Router() {
           <Route path="dashboard" element={<DashboardPage />} />
           <Route path="deliveries" element={<DeliveriesPage />} />
           <Route path="routes" element={<RoutesPage />} />
-          <Route path="drivers" element={<div style={{padding:20}}>Drivers page (todo)</div>} />
-          <Route path="vehicles" element={<div style={{padding:20}}>Vehicles page (todo)</div>} />
+          <Route path="drivers" element={<DriversPage />} />
+          <Route path="vehicles" element={<VehiclesPage />} />
           <Route path="warehouses" element={<div style={{padding:20}}>Warehouses page (todo)</div>} />
         </Route>
 

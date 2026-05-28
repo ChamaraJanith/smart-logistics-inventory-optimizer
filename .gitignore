@@ -58,3 +58,5 @@ docker-compose.*.yml
 *.keystore
 secrets/
 
+
+.fake
