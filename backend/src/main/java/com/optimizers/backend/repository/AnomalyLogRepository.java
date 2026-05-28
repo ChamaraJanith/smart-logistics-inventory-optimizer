@@ -20,4 +20,11 @@ public interface AnomalyLogRepository
 
     List<AnomalyLog> findByAnomalyTypeAndStatus(
             String anomalyType, String status);
+
+        // Count open anomalies
+        long countByStatus(String status);
+
+        // Recent 5 open anomalies
+        List<AnomalyLog> findTop5ByStatusOrderByDetectedAtDesc(
+                String status);
 }

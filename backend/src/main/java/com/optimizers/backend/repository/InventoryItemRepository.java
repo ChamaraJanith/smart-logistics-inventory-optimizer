@@ -14,4 +14,11 @@ public interface InventoryItemRepository extends JpaRepository<InventoryItem, In
     List<InventoryItem> findByWarehouse_WarehouseIdAndStatus(Integer warehouseId, String status);
     Optional<InventoryItem> findBySku(String sku);
     List<InventoryItem> findByCategory(String category);
+
+    // Count active items
+    long countByStatus(String status);
+
+    // Count active items by warehouse
+    long countByWarehouse_WarehouseIdAndStatus(
+        Integer warehouseId, String status);
 }
