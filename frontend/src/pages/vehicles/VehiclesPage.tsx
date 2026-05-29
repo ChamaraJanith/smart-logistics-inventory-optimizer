@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { authFetch } from '../../auth/AuthContext'
 import '../../styles/vehicles.css'
 
 interface VehicleItem {
@@ -41,7 +42,7 @@ export default function VehiclesPage() {
     try {
       setLoading(true)
       setError(null)
-      const res = await fetch('/api/v1/vehicles')
+      const res = await authFetch('/api/v1/vehicles')
       if (!res.ok) throw new Error(`${res.status} ${res.statusText}`)
       const data = await res.json()
       setVehicles(data)
@@ -89,7 +90,7 @@ export default function VehiclesPage() {
         currentLongitude: formData.currentLongitude ? Number(formData.currentLongitude) : null
       }
 
-      const res = await fetch(url, {
+      const res = await authFetch(url, {
         method: isEdit ? 'PUT' : 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
@@ -108,7 +109,7 @@ export default function VehiclesPage() {
     if (!confirm('Are you sure you want to delete this vehicle?')) return
     
     try {
-      const res = await fetch(`/api/v1/vehicles/${id}`, { method: 'DELETE' })
+      const res = await authFetch(`/api/v1/vehicles/${id}`, { method: 'DELETE' })
       if (!res.ok) throw new Error(`Failed to delete: ${res.statusText}`)
       await loadData()
     } catch (err: any) {

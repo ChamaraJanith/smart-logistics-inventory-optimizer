@@ -1,4 +1,3 @@
-import React from 'react'
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, BarChart, Bar, CartesianGrid } from 'recharts'
 
 export function DeliveryTrendsChart({ data }: { data: number[] }) {

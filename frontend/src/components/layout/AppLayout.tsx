@@ -22,7 +22,7 @@ export default function AppLayout() {
 
   return (
     <div className="app-layout" style={{ display: 'flex', minHeight: '100vh' }}>
-      <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+      <Sidebar open={sidebarOpen} />
       <div className="app-main" style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
         <Topbar onMenuClick={() => setSidebarOpen(!sidebarOpen)} />
         <main className="app-content" style={{ padding: 24 }}>

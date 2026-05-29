@@ -6,10 +6,11 @@ const items = [
   { to: '/app/routes', label: 'Routes' },
   { to: '/app/drivers', label: 'Drivers' },
   { to: '/app/vehicles', label: 'Vehicles' },
+  { to: '/app/account', label: 'Account' },
   { to: '/app/warehouses', label: 'Warehouses' },
 ]
 
-export default function Sidebar({ open, onClose }: { open?: boolean; onClose?: () => void }) {
+export default function Sidebar({ open }: { open?: boolean }) {
   return (
     <aside className={`app-sidebar ${open ? 'open' : ''}`}>
       <div className="app-sidebar__brand">
