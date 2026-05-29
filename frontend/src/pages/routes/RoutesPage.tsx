@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { authFetch } from '../../auth/AuthContext'
 import '../../styles/routes.css'
 import RouteMap from '../../components/map/RouteMap'
 
@@ -56,7 +57,7 @@ export default function RoutesPage() {
     try {
       setLoading(true)
       setError(null)
-      const res = await fetch('/api/v1/routes')
+      const res = await authFetch('/api/v1/routes')
       if (!res.ok) throw new Error(`${res.status} ${res.statusText}`)
       const data = await res.json()
       setRoutes(data)
@@ -114,7 +115,7 @@ export default function RoutesPage() {
         optimizationScore: Number(formData.optimizationScore) || 0
       }
 
-      const res = await fetch(url, {
+      const res = await authFetch(url, {
         method: isEdit ? 'PUT' : 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -135,7 +136,7 @@ export default function RoutesPage() {
     if (!confirm('Are you sure you want to delete this route?')) return
     
     try {
-      const res = await fetch(`/api/v1/routes/${id}`, {
+      const res = await authFetch(`/api/v1/routes/${id}`, {
         method: 'DELETE'
       })
       if (!res.ok) throw new Error(`Failed to delete: ${res.statusText}`)

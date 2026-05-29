@@ -1,13 +1,17 @@
 import { useEffect, useState } from 'react'
 import '../../styles/dashboard.css'
-import DeliveryTrendsChart, { DriverPerformanceChart } from '../../components/dashboard/Charts'
-import DashboardLiveMap from '../../components/dashboard/DashboardLiveMap'
+import { authFetch } from '../../auth/AuthContext'
+import DeliveryTrendsChart from '../../components/dashboard/Charts'
 
 async function safeJsonFetch(url: string) {
-  const res = await fetch(url)
+  const res = await authFetch(url)
+  if (res.status === 401) {
+    window.location.href = '/login'
+    throw new Error('Unauthorized')
+  }
+
   const ct = res.headers.get('content-type') || ''
   if (!res.ok) {
-    // try to surface body text for debugging
     const body = await res.text().catch(() => '')
     throw new Error(`${res.status} ${res.statusText} - ${body.slice(0, 200)}`)
   }

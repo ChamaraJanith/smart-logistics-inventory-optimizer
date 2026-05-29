@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { authFetch } from '../../auth/AuthContext'
 import '../../styles/deliveries.css'
 
 interface Delivery {
@@ -41,7 +42,7 @@ export default function DeliveriesPage() {
     try {
       setLoading(true)
       setError(null)
-      const res = await fetch('/api/v1/deliveries')
+      const res = await authFetch('/api/v1/deliveries')
       if (!res.ok) throw new Error(`${res.status} ${res.statusText}`)
       const data = await res.json()
       setDeliveries(data)
@@ -90,7 +91,7 @@ export default function DeliveriesPage() {
         longitude: Number(formData.longitude) || 0
       }
 
-      const res = await fetch(url, {
+      const res = await authFetch(url, {
         method: isEdit ? 'PUT' : 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -111,7 +112,7 @@ export default function DeliveriesPage() {
     if (!confirm('Are you sure you want to delete this delivery?')) return
     
     try {
-      const res = await fetch(`/api/v1/deliveries/${id}`, {
+      const res = await authFetch(`/api/v1/deliveries/${id}`, {
         method: 'DELETE'
       })
       if (!res.ok) throw new Error(`Failed to delete: ${res.statusText}`)

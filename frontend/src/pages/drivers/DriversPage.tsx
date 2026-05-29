@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { authFetch } from '../../auth/AuthContext'
 import '../../styles/drivers.css'
 
 interface DriverItem {
@@ -36,7 +37,7 @@ export default function DriversPage() {
     try {
       setLoading(true)
       setError(null)
-      const res = await fetch('/api/v1/drivers')
+      const res = await authFetch('/api/v1/drivers')
       if (!res.ok) throw new Error(`${res.status} ${res.statusText}`)
       const data = await res.json()
       setDrivers(data)
@@ -78,7 +79,7 @@ export default function DriversPage() {
         vehicleId: formData.vehicleId ? Number(formData.vehicleId) : null
       }
 
-      const res = await fetch(url, {
+      const res = await authFetch(url, {
         method: isEdit ? 'PUT' : 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
@@ -97,7 +98,7 @@ export default function DriversPage() {
     if (!confirm('Are you sure you want to delete this driver?')) return
     
     try {
-      const res = await fetch(`/api/v1/drivers/${id}`, { method: 'DELETE' })
+      const res = await authFetch(`/api/v1/drivers/${id}`, { method: 'DELETE' })
       if (!res.ok) throw new Error(`Failed to delete: ${res.statusText}`)
       await loadData()
     } catch (err: any) {

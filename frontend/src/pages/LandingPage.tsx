@@ -220,7 +220,7 @@ export default function LandingPage() {
           </nav>
 
           <div className="lp-nav__actions">
-            <Link to="/app/dashboard" className="lp-btn lp-btn--ghost lp-btn--sm">Sign In</Link>
+            <Link to="/login" className="lp-btn lp-btn--ghost lp-btn--sm">Sign In</Link>
             <Link to="/app/dashboard" className="lp-btn lp-btn--primary lp-btn--sm">Get Started</Link>
           </div>
 
