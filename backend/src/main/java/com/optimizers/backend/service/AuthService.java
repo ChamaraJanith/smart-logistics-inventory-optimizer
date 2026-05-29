@@ -14,9 +14,16 @@ import com.optimizers.backend.dto.request.PasswordChangeRequestDTO;
 import com.optimizers.backend.entity.UserAccount;
 import com.optimizers.backend.repository.UserRepository;
 import com.optimizers.backend.util.JwtUtil;
+import org.springframework.beans.factory.annotation.Value;
 
 @Service
 public class AuthService {
+
+    @Value("${default.admin.username}")
+    private String defaultAdminUsername;
+
+    @Value("${default.admin.password}")
+    private String defaultAdminPassword;
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
@@ -29,12 +36,18 @@ public class AuthService {
         this.passwordEncoder = new BCryptPasswordEncoder();
     }
 
-    @PostConstruct
+   @PostConstruct
     public void initializeDefaultUser() {
-        Optional<UserAccount> existing = userRepository.findByUsername("admin");
+        Optional<UserAccount> existing =
+                userRepository.findByUsername(defaultAdminUsername);
+
         if (existing.isEmpty()) {
-            String passwordHash = passwordEncoder.encode("admin123");
-            UserAccount defaultUser = new UserAccount("admin", passwordHash);
+            String passwordHash =
+                    passwordEncoder.encode(defaultAdminPassword);
+
+            UserAccount defaultUser =
+                    new UserAccount(defaultAdminUsername, passwordHash);
+
             userRepository.save(defaultUser);
         }
     }

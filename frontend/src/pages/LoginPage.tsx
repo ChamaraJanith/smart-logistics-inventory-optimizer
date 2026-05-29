@@ -6,8 +6,8 @@ import { useAuth } from '../auth/AuthContext'
 export default function LoginPage() {
   const auth = useAuth()
   const navigate = useNavigate()
-  const [username, setUsername] = useState('admin')
-  const [password, setPassword] = useState('admin123')
+  const [username, setUsername] = useState('')
+  const [password, setPassword] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
 
@@ -26,37 +26,12 @@ export default function LoginPage() {
     }
   }
 
-  const fillDemoCredentials = () => {
-    setUsername('admin')
-    setPassword('admin123')
-  }
-
   return (
     <div className="auth-page">
       <div className="auth-card">
         <h1>Sign In</h1>
         <p>Enter your username and password to access the dashboard.</p>
 
-        <div className="auth-demo-box">
-          <div className="auth-demo-title">📝 Demo Credentials</div>
-          <div className="auth-demo-content">
-            <div className="auth-demo-item">
-              <span className="auth-demo-label">Username:</span>
-              <span className="auth-demo-value">admin</span>
-            </div>
-            <div className="auth-demo-item">
-              <span className="auth-demo-label">Password:</span>
-              <span className="auth-demo-value">admin123</span>
-            </div>
-            <button 
-              type="button" 
-              onClick={fillDemoCredentials}
-              className="auth-demo-button"
-            >
-              Auto-fill Demo Credentials
-            </button>
-          </div>
-        </div>
 
         {error && <div className="auth-error">{error}</div>}
 
