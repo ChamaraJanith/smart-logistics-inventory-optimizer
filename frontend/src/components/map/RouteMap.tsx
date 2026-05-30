@@ -1,4 +1,4 @@
-import { MapContainer, TileLayer, Marker, Popup, Polyline, useMap } from 'react-leaflet'
+import { MapContainer, TileLayer, Marker, Popup, Polyline, useMap, CircleMarker } from 'react-leaflet'
 import { useEffect, useState } from 'react'
 import 'leaflet/dist/leaflet.css'
 import L from 'leaflet'
@@ -32,9 +32,10 @@ interface RouteMapProps {
   endLat?: number
   endLng?: number
   routeId?: number
+  status?: string
 }
 
-export default function RouteMap({ startLat, startLng, endLat, endLng, routeId }: RouteMapProps) {
+export default function RouteMap({ startLat, startLng, endLat, endLng, routeId, status }: RouteMapProps) {
   // Use Colombo as default center if no coordinates
   
   // Add some pseudo-randomness based on routeId to make static coords look different
@@ -45,6 +46,13 @@ export default function RouteMap({ startLat, startLng, endLat, endLng, routeId }
   
   const polyline: [number, number][] = [startPos, endPos]
   const zoomLevel = routeId ? 12 : 11
+  
+  // Status-based color mapping
+  let statusColor = '#10b981' // Green (default)
+  if (status === 'PLANNED') statusColor = '#f59e0b' // Yellow
+  else if (status === 'IN_PROGRESS') statusColor = '#10b981' // Green
+  else if (status === 'ACTIVE') statusColor = '#10b981' // Green
+  else if (status === 'COMPLETED') statusColor = '#6b7280' // Gray
   
   const [mounted, setMounted] = useState(false)
   useEffect(() => {
@@ -68,19 +76,42 @@ export default function RouteMap({ startLat, startLng, endLat, endLng, routeId }
           className="map-tiles"
         />
         
-        <Marker position={startPos}>
+        {/* Start Location - Warehouse (Blue) */}
+        <CircleMarker 
+          center={startPos} 
+          radius={10}
+          color="#3b82f6"
+          fillColor="#3b82f6"
+          fillOpacity={0.8}
+          weight={2}
+        >
           <Popup>
-            Start Location (Warehouse)
+            <div style={{ color: '#000', fontSize: '13px' }}>
+              <strong>📍 Start Location</strong><br/>
+              Warehouse
+            </div>
           </Popup>
-        </Marker>
+        </CircleMarker>
         
-        <Marker position={endPos}>
+        {/* End Location - Destination (Status-based color) */}
+        <CircleMarker 
+          center={endPos}
+          radius={10}
+          color={statusColor}
+          fillColor={statusColor}
+          fillOpacity={0.8}
+          weight={2}
+        >
           <Popup>
-            End Location (Destination)
+            <div style={{ color: '#000', fontSize: '13px' }}>
+              <strong style={{ color: statusColor }}>📦 End Location</strong><br/>
+              Destination<br/>
+              <span style={{ fontSize: '12px', color: '#666' }}>Status: {status || 'N/A'}</span>
+            </div>
           </Popup>
-        </Marker>
+        </CircleMarker>
 
-        <Polyline positions={polyline} color="#4A90E2" weight={4} opacity={0.7} />
+        <Polyline positions={polyline} color={statusColor} weight={3} opacity={0.7} dashArray="5,5" />
       </MapContainer>
     </div>
   )

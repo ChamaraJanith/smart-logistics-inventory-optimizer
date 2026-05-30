@@ -164,7 +164,10 @@ export default function RoutesPage() {
         </div>
       </div>
 
-      <RouteMap routeId={selectedRoute?.routeId} />
+      <RouteMap 
+        routeId={selectedRoute?.routeId}
+        status={selectedRoute?.routeStatus}
+      />
 
       <div className="table-container" style={{ marginTop: '24px' }}>
         {loading && <div className="empty-state">Loading routes...</div>}
