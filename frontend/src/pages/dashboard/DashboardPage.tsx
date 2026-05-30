@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import '../../styles/dashboard.css'
 import { authFetch } from '../../auth/AuthContext'
 import DeliveryTrendsChart from '../../components/dashboard/Charts'
+import DashboardLiveMap from '../../components/dashboard/DashboardLiveMap'
 
 async function safeJsonFetch(url: string) {
   const res = await authFetch(url)

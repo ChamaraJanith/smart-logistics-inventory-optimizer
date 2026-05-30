@@ -2,6 +2,7 @@ import { MapContainer, TileLayer, Marker, Popup, CircleMarker } from 'react-leaf
 import { useEffect, useState } from 'react'
 import 'leaflet/dist/leaflet.css'
 import L from 'leaflet'
+import { authFetch } from '../../auth/AuthContext'
 
 import iconUrl from 'leaflet/dist/images/marker-icon.png'
 import iconShadow from 'leaflet/dist/images/marker-shadow.png'
@@ -62,7 +63,7 @@ export default function DashboardLiveMap() {
 
     async function fetchDeliveries() {
       try {
-        const res = await fetch('/api/v1/routes')
+        const res = await authFetch('/api/v1/routes')
         if (!res.ok) throw new Error('Failed to fetch routes')
         const routes = await res.json()
 
