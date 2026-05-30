@@ -152,6 +152,12 @@ export default function DashboardPage() {
         </div>
       )}
 
+      {/* Live Logistics Map Widget */}
+      <div style={{ marginTop: 24, marginBottom: 16 }}>
+        <h3 className="db-section-title">Live Deliveries Map</h3>
+        <DashboardLiveMap />
+      </div>
+
       <div className="db-main-grid">
         <div>
           <div className="db-card-section">
