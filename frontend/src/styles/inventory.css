@@ -1,0 +1,522 @@
+/* Inventory module styles — extends dashboard.css */
+@import './dashboard.css';
+
+/* ── Page wrapper ── */
+.inv-page {
+  padding: 32px 40px;
+  color: var(--app-text);
+  background: var(--app-bg);
+  min-height: 100vh;
+  font-family: 'Poppins', Inter, system-ui, sans-serif;
+}
+
+/* ── Page header ── */
+.inv-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 32px;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.inv-header h2 {
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  background: var(--grad-text);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: inline-block;
+}
+
+.inv-header-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+/* ── Filter bar ── */
+.inv-filters {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+.inv-filters select,
+.inv-filters input[type="text"] {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: var(--text);
+  padding: 9px 14px;
+  font-size: 14px;
+  font-family: inherit;
+  outline: none;
+  transition: border-color var(--t);
+  min-width: 160px;
+}
+
+.inv-filters select:focus,
+.inv-filters input[type="text"]:focus {
+  border-color: var(--blue);
+}
+
+/* ── KPI strip ── */
+.inv-kpi-strip {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 16px;
+  margin-bottom: 28px;
+}
+
+.inv-kpi-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  transition: all var(--t);
+}
+
+.inv-kpi-card:hover {
+  border-color: var(--border-h);
+  background: var(--bg-card-h);
+  transform: translateY(-3px);
+}
+
+.inv-kpi-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--text-3);
+}
+
+.inv-kpi-value {
+  font-size: 30px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -1px;
+}
+
+.inv-kpi-value.warn { color: var(--amber); }
+.inv-kpi-value.danger { color: var(--rose); }
+.inv-kpi-value.ok { color: var(--emerald); }
+
+/* ── Table container ── */
+.inv-table-wrap {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+
+.inv-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.inv-table thead th {
+  padding: 14px 16px;
+  text-align: left;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--text-3);
+  background: rgba(255,255,255,0.02);
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+.inv-table tbody tr {
+  border-bottom: 1px solid rgba(255,255,255,0.03);
+  transition: background var(--t);
+}
+
+.inv-table tbody tr:hover {
+  background: rgba(255,255,255,0.03);
+}
+
+.inv-table tbody tr:last-child {
+  border-bottom: none;
+}
+
+.inv-table td {
+  padding: 14px 16px;
+  color: var(--text);
+  vertical-align: middle;
+}
+
+.inv-table td.muted {
+  color: var(--text-3);
+  font-size: 13px;
+}
+
+/* ── Badges ── */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+
+/* Stock status */
+.badge--normal   { background: rgba(16,185,129,0.15); color: #34d399; border: 1px solid rgba(16,185,129,0.25); }
+.badge--low      { background: rgba(245,158,11,0.15); color: #fbbf24; border: 1px solid rgba(245,158,11,0.25); }
+.badge--critical { background: rgba(249,115,22,0.15); color: #fb923c; border: 1px solid rgba(249,115,22,0.25); }
+.badge--out_of_stock { background: rgba(239,68,68,0.15); color: #f87171; border: 1px solid rgba(239,68,68,0.25); }
+
+/* Warehouse / item status */
+.badge--active   { background: rgba(16,185,129,0.15); color: #34d399; border: 1px solid rgba(16,185,129,0.25); }
+.badge--inactive { background: rgba(239,68,68,0.15); color: #f87171; border: 1px solid rgba(239,68,68,0.25); }
+
+/* Severity */
+.badge--sev-low      { background: rgba(59,130,246,0.15); color: #60a5fa; border: 1px solid rgba(59,130,246,0.25); }
+.badge--sev-medium   { background: rgba(245,158,11,0.15); color: #fbbf24; border: 1px solid rgba(245,158,11,0.25); }
+.badge--sev-high     { background: rgba(249,115,22,0.15); color: #fb923c; border: 1px solid rgba(249,115,22,0.25); }
+.badge--sev-critical { background: rgba(239,68,68,0.15); color: #f87171; border: 1px solid rgba(239,68,68,0.25); }
+
+/* Transaction type */
+.badge--restock        { background: rgba(16,185,129,0.15); color: #34d399; border: 1px solid rgba(16,185,129,0.25); }
+.badge--dispatch       { background: rgba(239,68,68,0.15); color: #f87171; border: 1px solid rgba(239,68,68,0.25); }
+.badge--adjustment     { background: rgba(59,130,246,0.15); color: #60a5fa; border: 1px solid rgba(59,130,246,0.25); }
+.badge--reserve        { background: rgba(124,58,237,0.15); color: #a78bfa; border: 1px solid rgba(124,58,237,0.25); }
+.badge--release_reserve{ background: rgba(148,163,184,0.15); color: #94a3b8; border: 1px solid rgba(148,163,184,0.25); }
+
+/* Anomaly status */
+.badge--open     { background: rgba(239,68,68,0.15); color: #f87171; border: 1px solid rgba(239,68,68,0.25); }
+.badge--resolved { background: rgba(16,185,129,0.15); color: #34d399; border: 1px solid rgba(16,185,129,0.25); }
+
+/* ── Row action buttons ── */
+.inv-action-btn {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text-2);
+  cursor: pointer;
+  font-size: 13px;
+  padding: 6px 10px;
+  transition: all var(--t);
+  margin-right: 6px;
+}
+
+.inv-action-btn:hover {
+  background: rgba(255,255,255,0.08);
+  color: var(--text);
+  border-color: var(--border-h);
+}
+
+.inv-action-btn.danger:hover {
+  background: rgba(239,68,68,0.1);
+  color: var(--rose);
+  border-color: rgba(239,68,68,0.3);
+}
+
+.inv-action-btn.resolve:hover {
+  background: rgba(16,185,129,0.1);
+  color: var(--emerald);
+  border-color: rgba(16,185,129,0.3);
+}
+
+/* ── Empty / loading states ── */
+.inv-empty {
+  text-align: center;
+  padding: 60px 24px;
+  color: var(--text-3);
+  font-size: 15px;
+}
+
+.inv-error {
+  color: var(--rose);
+  padding: 16px 20px;
+  background: rgba(239,68,68,0.08);
+  border: 1px solid rgba(239,68,68,0.2);
+  border-radius: 12px;
+  margin-bottom: 20px;
+  font-size: 14px;
+}
+
+/* ── Modal ── */
+.inv-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  backdrop-filter: blur(4px);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.inv-modal {
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 32px;
+  width: 100%;
+  max-width: 560px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: var(--shadow-lg);
+}
+
+.inv-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 28px;
+}
+
+.inv-modal-header h3 {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -0.3px;
+}
+
+.inv-modal-close {
+  background: rgba(255,255,255,0.06);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text-2);
+  cursor: pointer;
+  font-size: 18px;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--t);
+}
+
+.inv-modal-close:hover {
+  background: rgba(255,255,255,0.1);
+  color: var(--text);
+}
+
+/* ── Form group ── */
+.inv-form-row {
+  display: flex;
+  gap: 16px;
+}
+
+.inv-form-row .inv-field {
+  flex: 1;
+}
+
+.inv-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+.inv-field label {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: var(--text-3);
+}
+
+.inv-field input,
+.inv-field select,
+.inv-field textarea {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: var(--text);
+  padding: 10px 14px;
+  font-size: 14px;
+  font-family: inherit;
+  outline: none;
+  transition: border-color var(--t), background var(--t);
+  width: 100%;
+}
+
+.inv-field select option {
+  background: var(--bg-2);
+  color: var(--text);
+}
+
+.inv-field input:focus,
+.inv-field select:focus,
+.inv-field textarea:focus {
+  border-color: var(--blue);
+  background: rgba(37,99,235,0.05);
+}
+
+.inv-field-error {
+  font-size: 12px;
+  color: var(--rose);
+  margin-top: 2px;
+}
+
+/* ── Modal actions ── */
+.inv-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 8px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border);
+}
+
+/* ── Confirm dialog ── */
+.inv-confirm {
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 32px;
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+}
+
+.inv-confirm h4 {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 12px;
+}
+
+.inv-confirm p {
+  color: var(--text-2);
+  font-size: 14px;
+  margin-bottom: 24px;
+}
+
+.inv-confirm-actions {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+}
+
+/* ── Recharts override ── */
+.recharts-text { fill: var(--text-2) !important; }
+.recharts-cartesian-grid-horizontal line,
+.recharts-cartesian-grid-vertical line { stroke: rgba(255,255,255,0.06) !important; }
+.recharts-tooltip-wrapper .recharts-default-tooltip {
+  background: var(--bg-2) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 10px !important;
+  font-family: 'Poppins', Inter, sans-serif !important;
+}
+
+/* ── Toggle button ── */
+.inv-toggle {
+  display: inline-flex;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.inv-toggle button {
+  padding: 8px 16px;
+  background: none;
+  border: none;
+  color: var(--text-2);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--t);
+  font-family: inherit;
+}
+
+.inv-toggle button.active {
+  background: rgba(37,99,235,0.2);
+  color: #60a5fa;
+}
+
+/* ── Pagination ── */
+.inv-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 16px 20px;
+  border-top: 1px solid var(--border);
+  font-size: 13px;
+  color: var(--text-3);
+}
+
+.inv-pagination button {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text-2);
+  padding: 6px 12px;
+  cursor: pointer;
+  font-size: 13px;
+  font-family: inherit;
+  transition: all var(--t);
+}
+
+.inv-pagination button:hover:not(:disabled) {
+  background: rgba(255,255,255,0.08);
+  color: var(--text);
+}
+
+.inv-pagination button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* Forecast chart section */
+.forecast-section {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 28px;
+  margin-bottom: 24px;
+}
+
+.forecast-meta {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
+}
+
+.forecast-meta-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.forecast-meta-item span:first-child {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: var(--text-3);
+  font-weight: 700;
+}
+
+.forecast-meta-item span:last-child {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+@media (max-width: 1024px) {
+  .inv-page { padding: 24px 20px; }
+  .inv-form-row { flex-direction: column; gap: 0; }
+}
