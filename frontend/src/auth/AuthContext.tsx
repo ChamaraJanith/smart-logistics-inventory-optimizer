@@ -14,9 +14,20 @@ const AuthContext = createContext<AuthContextValue | undefined>(undefined)
 
 const STORAGE_KEY = 'logioptima-auth'
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? ''
+
+function getLocalStorage() {
+  return globalThis.localStorage
+}
+
+function buildApiUrl(path: string) {
+  if (!API_BASE_URL) return path
+  return `${API_BASE_URL}${path}`
+}
+
 function loadStoredAuth(): AuthState {
   try {
-    const raw = window.localStorage.getItem(STORAGE_KEY)
+    const raw = getLocalStorage().getItem(STORAGE_KEY)
     if (!raw) return { token: null, username: null }
     return JSON.parse(raw) as AuthState
   } catch {
@@ -24,19 +35,19 @@ function loadStoredAuth(): AuthState {
   }
 }
 
-export function AuthProvider({ children }: { children: ReactNode }) {
+export function AuthProvider({ children }: Readonly<{ children: ReactNode }>) {
   const [state, setState] = useState<AuthState>(() => loadStoredAuth())
 
   useEffect(() => {
     if (state.token && state.username) {
-      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state))
+      getLocalStorage().setItem(STORAGE_KEY, JSON.stringify(state))
     } else {
-      window.localStorage.removeItem(STORAGE_KEY)
+      getLocalStorage().removeItem(STORAGE_KEY)
     }
   }, [state])
 
   const login = async (username: string, password: string) => {
-    const response = await fetch('/api/auth/login', {
+    const response = await fetch(buildApiUrl('/api/auth/login'), {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -53,7 +64,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const newState = { token: data.token, username: data.username }
     
     // Write to localStorage immediately so it's available synchronously
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(newState))
+    getLocalStorage().setItem(STORAGE_KEY, JSON.stringify(newState))
     
     // Then update state
     setState(newState)
@@ -83,13 +94,14 @@ export function useAuth() {
 }
 
 export async function authFetch(input: RequestInfo, init?: RequestInit) {
-  const raw = window.localStorage.getItem(STORAGE_KEY)
+  const raw = getLocalStorage().getItem(STORAGE_KEY)
   const stored = raw ? (JSON.parse(raw) as AuthState) : null
   const headers = new Headers(init?.headers || {})
   if (stored?.token) {
     headers.set('Authorization', `Bearer ${stored.token}`)
   }
 
-  const response = await fetch(input, { ...init, headers })
+  const requestInput = typeof input === 'string' && input.startsWith('/') ? buildApiUrl(input) : input
+  const response = await fetch(requestInput, { ...init, headers })
   return response
 }
