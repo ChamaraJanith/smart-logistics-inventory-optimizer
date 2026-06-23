@@ -7,6 +7,8 @@ import com.optimizers.backend.dto.request.RouteRequestDTO;
 import com.optimizers.backend.dto.response.RouteResponseDTO;
 import com.optimizers.backend.dto.response.RouteSummaryDTO;
 
+import com.optimizers.backend.dto.response.RouteStockValidationDTO;
+
 public interface RouteService {
     RouteResponseDTO createRoute(RouteRequestDTO requestDTO);
     RouteResponseDTO getRouteById(Integer id);
@@ -16,4 +18,6 @@ public interface RouteService {
     RouteResponseDTO updateRoute(Integer id, RouteRequestDTO requestDTO);
     void deleteRoute(Integer id);
     RouteSummaryDTO getRouteSummary(Integer routeId);
+    RouteStockValidationDTO validateRouteStock(Integer routeId);
+    void allocateRouteStock(Integer routeId);
 }

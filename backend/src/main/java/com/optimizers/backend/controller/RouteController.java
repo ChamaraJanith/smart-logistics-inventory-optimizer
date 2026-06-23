@@ -67,4 +67,15 @@ public class RouteController {
         routeService.deleteRoute(id);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/{id}/stock-validation")
+    public ResponseEntity<com.optimizers.backend.dto.response.RouteStockValidationDTO> validateRouteStock(@PathVariable Integer id) {
+        return ResponseEntity.ok(routeService.validateRouteStock(id));
+    }
+
+    @PostMapping("/{id}/allocate-stock")
+    public ResponseEntity<Void> allocateRouteStock(@PathVariable Integer id) {
+        routeService.allocateRouteStock(id);
+        return ResponseEntity.ok().build();
+    }
 }

@@ -39,4 +39,9 @@ public class ReorderAlertController {
     public ResponseEntity<ReorderAlertResponseDTO> resolveAlert(@PathVariable Integer alertId) {
         return ResponseEntity.ok(alertService.resolveAlert(alertId));
     }
+
+    @PostMapping("/{alertId}/plan-replenishment")
+    public ResponseEntity<com.optimizers.backend.dto.response.RouteResponseDTO> planReplenishment(@PathVariable Integer alertId) {
+        return ResponseEntity.ok(alertService.planReplenishment(alertId));
+    }
 }

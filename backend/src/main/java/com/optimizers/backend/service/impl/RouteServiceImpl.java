@@ -3,7 +3,6 @@ package com.optimizers.backend.service.impl;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -22,6 +21,20 @@ import com.optimizers.backend.repository.RouteRepository;
 import com.optimizers.backend.repository.VehicleRepository;
 import com.optimizers.backend.service.RouteService;
 
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import org.springframework.transaction.annotation.Transactional;
+import com.optimizers.backend.dto.request.StockUpdateRequestDTO;
+import com.optimizers.backend.dto.response.RouteStockValidationDTO;
+import com.optimizers.backend.dto.response.RouteStockItemValidationDTO;
+import com.optimizers.backend.entity.DeliveryItem;
+import com.optimizers.backend.entity.InventoryStock;
+import com.optimizers.backend.repository.DeliveryItemRepository;
+import com.optimizers.backend.repository.InventoryStockRepository;
+import com.optimizers.backend.service.InventoryStockService;
+
 @Service
 public class RouteServiceImpl implements RouteService {
 
@@ -36,6 +49,15 @@ public class RouteServiceImpl implements RouteService {
 
     @Autowired
     private RouteDeliveryRepository routeDeliveryRepository;
+
+    @Autowired
+    private DeliveryItemRepository deliveryItemRepository;
+
+    @Autowired
+    private InventoryStockRepository inventoryStockRepository;
+
+    @Autowired
+    private InventoryStockService inventoryStockService;
 
     @Override
     public RouteResponseDTO createRoute(RouteRequestDTO requestDTO) {
@@ -77,9 +99,15 @@ public class RouteServiceImpl implements RouteService {
     }
 
     @Override
+    @Transactional
     public RouteResponseDTO updateRoute(Integer id, RouteRequestDTO requestDTO) {
         Route route = routeRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Route not found with id: " + id));
+
+        String oldStatus = route.getRouteStatus();
+        String newStatus = requestDTO.getRouteStatus();
+
+        handleStatusTransition(route, oldStatus, newStatus);
 
         mapToEntity(route, requestDTO);
         Route updatedRoute = routeRepository.save(route);
@@ -190,5 +218,187 @@ public class RouteServiceImpl implements RouteService {
                 route.getRouteStatus(),
                 route.getCreatedAt()
         );
+    }
+
+    @Override
+    public RouteStockValidationDTO validateRouteStock(Integer routeId) {
+        Route route = routeRepository.findById(routeId)
+                .orElseThrow(() -> new ResourceNotFoundException("Route not found: " + routeId));
+
+        List<RouteDelivery> routeDeliveries = routeDeliveryRepository
+                .findByRouteRouteIdOrderByStopSequenceAsc(routeId);
+
+        BigDecimal totalWeight = BigDecimal.ZERO;
+        BigDecimal totalVolume = BigDecimal.ZERO;
+        Map<Integer, BigDecimal> itemQuantities = new HashMap<>();
+
+        for (RouteDelivery rd : routeDeliveries) {
+            BigDecimal packageWeight = rd.getDelivery().getPackageWeight();
+            BigDecimal packageVolume = rd.getDelivery().getPackageVolume();
+            if (packageWeight != null) {
+                totalWeight = totalWeight.add(packageWeight);
+            }
+            if (packageVolume != null) {
+                totalVolume = totalVolume.add(packageVolume);
+            }
+
+            List<DeliveryItem> deliveryItems = deliveryItemRepository.findByDelivery_DeliveryId(rd.getDelivery().getDeliveryId());
+            for (DeliveryItem di : deliveryItems) {
+                Integer itemId = di.getItem().getItemId();
+                BigDecimal currentQty = itemQuantities.getOrDefault(itemId, BigDecimal.ZERO);
+                itemQuantities.put(itemId, currentQty.add(di.getQuantity()));
+            }
+        }
+
+        List<RouteStockItemValidationDTO> validationItems = new ArrayList<>();
+        boolean hasShortage = false;
+
+        for (Map.Entry<Integer, BigDecimal> entry : itemQuantities.entrySet()) {
+            Integer itemId = entry.getKey();
+            BigDecimal qtyRequired = entry.getValue();
+
+            InventoryStock stock = inventoryStockRepository.findByItem_ItemId(itemId)
+                    .orElse(null);
+
+            BigDecimal availableQty = BigDecimal.ZERO;
+            String itemName = "Unknown Item";
+            String sku = "N/A";
+
+            if (stock != null) {
+                availableQty = stock.getAvailableQuantity() != null ? stock.getAvailableQuantity() : BigDecimal.ZERO;
+                itemName = stock.getItem().getItemName();
+                sku = stock.getItem().getSku();
+            }
+
+            boolean isShort = availableQty.compareTo(qtyRequired) < 0;
+            if (isShort) {
+                hasShortage = true;
+            }
+
+            validationItems.add(new RouteStockItemValidationDTO(
+                    itemId, itemName, sku, qtyRequired, availableQty, isShort
+            ));
+        }
+
+        BigDecimal vehicleWeightCap = route.getVehicle().getCapacityKg();
+        BigDecimal vehicleVolumeCap = route.getVehicle().getMaxVolume();
+
+        return new RouteStockValidationDTO(
+                validationItems, hasShortage, totalWeight, totalVolume, vehicleWeightCap, vehicleVolumeCap
+        );
+    }
+
+    @Override
+    @Transactional
+    public void allocateRouteStock(Integer routeId) {
+        Route route = routeRepository.findById(routeId)
+                .orElseThrow(() -> new ResourceNotFoundException("Route not found: " + routeId));
+
+        if (!"PLANNED".equalsIgnoreCase(route.getRouteStatus())) {
+            throw new IllegalArgumentException("Only planned routes can allocate stock.");
+        }
+
+        List<RouteDelivery> routeDeliveries = routeDeliveryRepository
+                .findByRouteRouteIdOrderByStopSequenceAsc(routeId);
+
+        for (RouteDelivery rd : routeDeliveries) {
+            List<DeliveryItem> deliveryItems = deliveryItemRepository.findByDelivery_DeliveryId(rd.getDelivery().getDeliveryId());
+            for (DeliveryItem di : deliveryItems) {
+                if (di.getAllocatedStock() != null) {
+                    continue;
+                }
+
+                InventoryStock stock = inventoryStockRepository.findByItem_ItemId(di.getItem().getItemId())
+                        .orElseThrow(() -> new ResourceNotFoundException("Stock not found for item: " + di.getItem().getItemName()));
+
+                BigDecimal availableQty = stock.getAvailableQuantity() != null ? stock.getAvailableQuantity() : BigDecimal.ZERO;
+                if (availableQty.compareTo(di.getQuantity()) < 0) {
+                    throw new IllegalArgumentException("Insufficient stock for item: " + di.getItem().getItemName() +
+                            ". Required: " + di.getQuantity() + ", Available: " + availableQty);
+                }
+
+                StockUpdateRequestDTO updateDTO = new StockUpdateRequestDTO();
+                updateDTO.setTransactionType("RESERVE");
+                updateDTO.setQuantity(di.getQuantity());
+                updateDTO.setNotes("Allocated for Route #" + routeId);
+                updateDTO.setPerformedBy("System (Logistics)");
+
+                inventoryStockService.updateStock(stock.getStockId(), updateDTO);
+
+                di.setAllocatedStock(stock);
+                deliveryItemRepository.save(di);
+            }
+        }
+    }
+
+    private void handleStatusTransition(Route route, String oldStatus, String newStatus) {
+        if (oldStatus == null) oldStatus = "PLANNED";
+        if (newStatus == null) newStatus = "PLANNED";
+
+        if (oldStatus.equalsIgnoreCase(newStatus)) {
+            return;
+        }
+
+        List<RouteDelivery> routeDeliveries = routeDeliveryRepository
+                .findByRouteRouteIdOrderByStopSequenceAsc(route.getRouteId());
+
+        if ("PLANNED".equalsIgnoreCase(oldStatus) && 
+                ("ACTIVE".equalsIgnoreCase(newStatus) || "COMPLETED".equalsIgnoreCase(newStatus))) {
+            
+            for (RouteDelivery rd : routeDeliveries) {
+                List<DeliveryItem> deliveryItems = deliveryItemRepository.findByDelivery_DeliveryId(rd.getDelivery().getDeliveryId());
+                for (DeliveryItem di : deliveryItems) {
+                    InventoryStock stock = inventoryStockRepository.findByItem_ItemId(di.getItem().getItemId()).orElse(null);
+                    if (stock == null) continue;
+
+                    BigDecimal qty = di.getQuantity();
+
+                    if (di.getAllocatedStock() != null) {
+                        try {
+                            StockUpdateRequestDTO releaseDTO = new StockUpdateRequestDTO();
+                            releaseDTO.setTransactionType("RELEASE_RESERVE");
+                            releaseDTO.setQuantity(qty);
+                            releaseDTO.setNotes("Released reservation for dispatch - Route #" + route.getRouteId());
+                            releaseDTO.setPerformedBy("System (Logistics)");
+                            inventoryStockService.updateStock(stock.getStockId(), releaseDTO);
+                        } catch (Exception e) {
+                            // ignore or log
+                        }
+                    }
+
+                    StockUpdateRequestDTO dispatchDTO = new StockUpdateRequestDTO();
+                    dispatchDTO.setTransactionType("DISPATCH");
+                    dispatchDTO.setQuantity(qty);
+                    dispatchDTO.setNotes("Dispatched for Route #" + route.getRouteId() + ", Delivery #" + rd.getDelivery().getDeliveryId());
+                    dispatchDTO.setPerformedBy("System (Logistics)");
+                    inventoryStockService.updateStock(stock.getStockId(), dispatchDTO);
+                }
+            }
+        }
+        else if ("PLANNED".equalsIgnoreCase(oldStatus) && "CANCELLED".equalsIgnoreCase(newStatus)) {
+            for (RouteDelivery rd : routeDeliveries) {
+                List<DeliveryItem> deliveryItems = deliveryItemRepository.findByDelivery_DeliveryId(rd.getDelivery().getDeliveryId());
+                for (DeliveryItem di : deliveryItems) {
+                    if (di.getAllocatedStock() != null) {
+                        InventoryStock stock = di.getAllocatedStock();
+                        BigDecimal qty = di.getQuantity();
+
+                        try {
+                            StockUpdateRequestDTO releaseDTO = new StockUpdateRequestDTO();
+                            releaseDTO.setTransactionType("RELEASE_RESERVE");
+                            releaseDTO.setQuantity(qty);
+                            releaseDTO.setNotes("Released reservation on cancellation - Route #" + route.getRouteId());
+                            releaseDTO.setPerformedBy("System (Logistics)");
+                            inventoryStockService.updateStock(stock.getStockId(), releaseDTO);
+                        } catch (Exception e) {
+                            // log
+                        }
+
+                        di.setAllocatedStock(null);
+                        deliveryItemRepository.save(di);
+                    }
+                }
+            }
+        }
     }
 }
