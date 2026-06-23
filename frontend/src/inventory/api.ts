@@ -211,6 +211,24 @@ export interface WarehouseStockSummary {
   openAlertsCount: number
 }
 
+export interface RouteStockItemValidation {
+  itemId: number
+  itemName: string
+  sku: string
+  quantityRequired: number
+  availableQuantity: number
+  isShort: boolean
+}
+
+export interface RouteStockValidation {
+  items: RouteStockItemValidation[]
+  hasShortage: boolean
+  totalWeightKg: number
+  totalVolume: number
+  vehicleWeightCapacity: number
+  vehicleVolumeCapacity: number
+}
+
 // ── Inventory Dashboard ──────────────────────────────────────────────
 
 export const invDashboard = {
@@ -259,6 +277,7 @@ export const alertApi = {
   getBySeverity: (sev: string) => get<ReorderAlertResponse[]>(`/reorder-alerts/severity/${encodeURIComponent(sev)}`),
   getByWarehouse: (wid: number) => get<ReorderAlertResponse[]>(`/reorder-alerts/warehouse/${wid}`),
   resolve: (alertId: number) => patch<ReorderAlertResponse>(`/reorder-alerts/${alertId}/resolve`),
+  planReplenishment: (alertId: number) => post<any>(`/reorder-alerts/${alertId}/plan-replenishment`, {}),
 }
 
 // ── Demand Forecast ────────────────────────────────────────────────────
@@ -288,3 +307,11 @@ export const txApi = {
   getByWarehouse: (wid: number) => get<StockTransactionResponse[]>(`/stock-transactions/warehouse/${wid}`),
   getByItem: (iid: number) => get<StockTransactionResponse[]>(`/stock-transactions/item/${iid}`),
 }
+
+// ── Routes ────────────────────────────────────────────────────────────
+
+export const routeApi = {
+  validateStock: (routeId: number) => get<RouteStockValidation>(`/routes/${routeId}/stock-validation`),
+  allocateStock: (routeId: number) => post<void>(`/routes/${routeId}/allocate-stock`, {}),
+}
+

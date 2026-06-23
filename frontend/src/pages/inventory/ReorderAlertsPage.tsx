@@ -1,4 +1,6 @@
 import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { authFetch } from '../../auth/AuthContext'
 import { alertApi, warehouseApi, type ReorderAlertResponse, type WarehouseResponse } from '../../inventory/api'
 import { formatDateTime, severityClass, fmtNum } from '../../inventory/utils'
 import '../../styles/inventory.css'
@@ -6,6 +8,7 @@ import '../../styles/inventory.css'
 const SEVERITIES = ['LOW', 'MEDIUM', 'HIGH', 'CRITICAL']
 
 export default function ReorderAlertsPage() {
+  const navigate = useNavigate()
   const [rows, setRows] = useState<ReorderAlertResponse[]>([])
   const [warehouses, setWarehouses] = useState<WarehouseResponse[]>([])
   const [loading, setLoading] = useState(true)
@@ -13,6 +16,27 @@ export default function ReorderAlertsPage() {
   const [sevFilter, setSevFilter] = useState('')
   const [whFilter, setWhFilter] = useState<number | ''>('')
   const [resolving, setResolving] = useState<number | null>(null)
+  const [replenishing, setReplenishing] = useState<number | null>(null)
+
+  async function handleReplenish(alertId: number) {
+    try {
+      setReplenishing(alertId)
+      const res = await authFetch(`/api/v1/reorder-alerts/${alertId}/plan-replenishment`, {
+        method: 'POST'
+      })
+      if (!res.ok) {
+        const text = await res.text()
+        throw new Error(text || 'Replenishment planning failed')
+      }
+      const data = await res.json()
+      alert(`Success! Replenishment Route #${data.routeId} created starting at Warehouse #${data.startWarehouseId}!`)
+      navigate('/app/routes')
+    } catch (ex: any) {
+      alert(ex.message || 'Replenishment planning failed')
+    } finally {
+      setReplenishing(null)
+    }
+  }
 
   async function load(sev?: string, wid?: number) {
     try {
@@ -114,13 +138,23 @@ export default function ReorderAlertsPage() {
                     <td className="muted">{formatDateTime(a.triggeredAt)}</td>
                     <td>
                       {a.status === 'OPEN' && (
-                        <button
-                          className="inv-action-btn resolve"
-                          onClick={() => handleResolve(a.alertId)}
-                          disabled={resolving === a.alertId}
-                        >
-                          {resolving === a.alertId ? '…' : '✓ Resolve'}
-                        </button>
+                        <div style={{ display: 'flex', gap: '8px' }}>
+                          <button
+                            className="inv-action-btn resolve"
+                            onClick={() => handleResolve(a.alertId)}
+                            disabled={resolving === a.alertId}
+                          >
+                            {resolving === a.alertId ? '…' : '✓ Resolve'}
+                          </button>
+                          <button
+                            className="inv-action-btn"
+                            style={{ background: 'rgba(59, 130, 246, 0.15)', color: '#60a5fa', border: '1px solid rgba(59, 130, 246, 0.3)' }}
+                            onClick={() => handleReplenish(a.alertId)}
+                            disabled={replenishing === a.alertId}
+                          >
+                            {replenishing === a.alertId ? '…' : '⚡ Replenish'}
+                          </button>
+                        </div>
                       )}
                     </td>
                   </tr>

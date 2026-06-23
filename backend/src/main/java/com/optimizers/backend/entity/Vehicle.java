@@ -10,6 +10,9 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
 
 @Entity
 @Table(name = "vehicle")
@@ -43,6 +46,10 @@ public class Vehicle {
 
     @Column(name = "current_longitude", precision = 10, scale = 7)
     private BigDecimal currentLongitude;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "current_warehouse_id")
+    private Warehouse currentWarehouse;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
@@ -143,6 +150,14 @@ public class Vehicle {
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public Warehouse getCurrentWarehouse() {
+        return currentWarehouse;
+    }
+
+    public void setCurrentWarehouse(Warehouse currentWarehouse) {
+        this.currentWarehouse = currentWarehouse;
     }
 
     @PrePersist

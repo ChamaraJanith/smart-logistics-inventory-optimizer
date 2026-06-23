@@ -28,6 +28,9 @@ export default function RoutesPage() {
   const [error, setError] = useState<string | null>(null)
 
   const [selectedRoute, setSelectedRoute] = useState<RouteItem | null>(null)
+  const [validationReport, setValidationReport] = useState<any | null>(null)
+  const [validating, setValidating] = useState(false)
+  const [allocating, setAllocating] = useState(false)
 
   // Modal states
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -52,6 +55,70 @@ export default function RoutesPage() {
   useEffect(() => {
     loadData()
   }, [])
+
+  useEffect(() => {
+    if (selectedRoute) {
+      loadValidationReport(selectedRoute.routeId)
+    } else {
+      setValidationReport(null)
+    }
+  }, [selectedRoute])
+
+  async function loadValidationReport(routeId: number) {
+    try {
+      setValidating(true)
+      const res = await authFetch(`/api/v1/routes/${routeId}/stock-validation`)
+      if (!res.ok) throw new Error()
+      const data = await res.json()
+      setValidationReport(data)
+    } catch (e) {
+      setValidationReport(null)
+    } finally {
+      setValidating(false)
+    }
+  }
+
+  async function handleAllocateStock() {
+    if (!selectedRoute) return
+    try {
+      setAllocating(true)
+      const res = await authFetch(`/api/v1/routes/${selectedRoute.routeId}/allocate-stock`, {
+        method: 'POST'
+      })
+      if (!res.ok) {
+        const text = await res.text()
+        throw new Error(text || 'Allocation failed')
+      }
+      alert('Stock allocated and reserved successfully!')
+      loadValidationReport(selectedRoute.routeId)
+      loadData()
+    } catch (err: any) {
+      alert(err.message || 'Allocation failed')
+    } finally {
+      setAllocating(false)
+    }
+  }
+
+  async function handleDispatchRoute() {
+    if (!selectedRoute) return
+    try {
+      const res = await authFetch(`/api/v1/routes/${selectedRoute.routeId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...selectedRoute,
+          routeStatus: 'ACTIVE'
+        })
+      })
+      if (!res.ok) throw new Error('Dispatch failed')
+      alert('Route dispatched successfully! Stock has been deducted from the warehouse.')
+      loadData()
+      const updated = await res.json()
+      setSelectedRoute(updated)
+    } catch (err: any) {
+      alert(err.message || 'Failed to dispatch route')
+    }
+  }
 
   async function loadData() {
     try {
@@ -169,6 +236,148 @@ export default function RoutesPage() {
         routeId={selectedRoute?.routeId}
         status={selectedRoute?.routeStatus}
       />
+
+      {selectedRoute && (
+        <div className="manifest-section" style={{
+          background: 'rgba(30, 41, 59, 0.45)',
+          backdropFilter: 'blur(12px)',
+          border: '1px solid rgba(255, 255, 255, 0.08)',
+          borderRadius: '16px',
+          padding: '24px',
+          marginTop: '24px',
+          boxShadow: '0 12px 40px 0 rgba(0, 0, 0, 0.25)'
+        }}>
+          <h3 style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', margin: 0, paddingBottom: '16px', borderBottom: '1px solid rgba(255, 255, 255, 0.1)', color: '#fff' }}>
+            <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>📦 Route #{selectedRoute.routeId} Dispatch Manifest</span>
+            <span style={{ fontSize: '13px', background: 'rgba(59, 130, 246, 0.15)', color: '#60a5fa', padding: '4px 12px', borderRadius: '20px', fontWeight: 600 }}>
+              Start Warehouse: #{selectedRoute.startWarehouseId}
+            </span>
+          </h3>
+
+          {validating ? (
+            <div style={{ padding: '32px 0', textAlign: 'center', color: 'var(--app-text-3)', fontSize: '15px' }}>
+              🔄 Analyzing warehouse stock levels & vehicle capacity...
+            </div>
+          ) : validationReport ? (
+            <div>
+              {/* Payload Progress Bars */}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', margin: '20px 0' }}>
+                <div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', fontSize: '13px', color: 'var(--app-text-2)' }}>
+                    <span>Weight Payload ({validationReport.totalWeightKg.toFixed(1)} / {validationReport.vehicleWeightCapacity} kg)</span>
+                    <span style={{ fontWeight: 600, color: validationReport.totalWeightKg > validationReport.vehicleWeightCapacity ? 'var(--app-error)' : '#10b981' }}>
+                      {((validationReport.totalWeightKg / validationReport.vehicleWeightCapacity) * 100).toFixed(0)}%
+                    </span>
+                  </div>
+                  <div style={{ height: '8px', background: 'rgba(255, 255, 255, 0.1)', borderRadius: '4px', overflow: 'hidden' }}>
+                    <div style={{
+                      height: '100%',
+                      width: `${Math.min((validationReport.totalWeightKg / validationReport.vehicleWeightCapacity) * 100, 100)}%`,
+                      background: validationReport.totalWeightKg > validationReport.vehicleWeightCapacity ? 'var(--app-error)' : 'linear-gradient(90deg, #3b82f6, #10b981)',
+                      transition: 'width 0.3s ease'
+                    }} />
+                  </div>
+                </div>
+
+                <div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', fontSize: '13px', color: 'var(--app-text-2)' }}>
+                    <span>Volume Payload ({validationReport.totalVolume.toFixed(1)} / {validationReport.vehicleVolumeCapacity} m³)</span>
+                    <span style={{ fontWeight: 600, color: validationReport.totalVolume > validationReport.vehicleVolumeCapacity ? 'var(--app-error)' : '#10b981' }}>
+                      {((validationReport.totalVolume / validationReport.vehicleVolumeCapacity) * 100).toFixed(0)}%
+                    </span>
+                  </div>
+                  <div style={{ height: '8px', background: 'rgba(255, 255, 255, 0.1)', borderRadius: '4px', overflow: 'hidden' }}>
+                    <div style={{
+                      height: '100%',
+                      width: `${Math.min((validationReport.totalVolume / validationReport.vehicleVolumeCapacity) * 100, 100)}%`,
+                      background: validationReport.totalVolume > validationReport.vehicleVolumeCapacity ? 'var(--app-error)' : 'linear-gradient(90deg, #3b82f6, #10b981)',
+                      transition: 'width 0.3s ease'
+                    }} />
+                  </div>
+                </div>
+              </div>
+
+              {validationReport.totalWeightKg > validationReport.vehicleWeightCapacity && (
+                <div style={{ background: 'rgba(239, 68, 68, 0.12)', border: '1px solid rgba(239, 68, 68, 0.3)', color: '#f87171', padding: '12px 16px', borderRadius: '8px', marginBottom: '20px', fontSize: '14px' }}>
+                  ⚠️ <strong>Vehicle Overloaded!</strong> The total payload weight exceeds the vehicle's capacity.
+                </div>
+              )}
+
+              {/* Items Checklist Table */}
+              <h4 style={{ margin: '24px 0 12px 0', color: '#fff', fontSize: '15px' }}>Required Inventory Items</h4>
+              <table className="app-table" style={{ background: 'transparent', margin: 0 }}>
+                <thead>
+                  <tr>
+                    <th>Item Name</th>
+                    <th>SKU</th>
+                    <th>Required Qty</th>
+                    <th>Available Qty (Start WH)</th>
+                    <th>Stock Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {validationReport.items.length === 0 ? (
+                    <tr>
+                      <td colSpan={5} style={{ textAlign: 'center', padding: '16px', color: 'var(--app-text-3)' }}>
+                        No items specified for this route's deliveries. Add items to deliveries first.
+                      </td>
+                    </tr>
+                  ) : (
+                    validationReport.items.map((item: any) => (
+                      <tr key={item.itemId}>
+                        <td style={{ fontWeight: 500, color: '#fff' }}>{item.itemName}</td>
+                        <td style={{ color: 'var(--app-blue)', fontWeight: 600 }}>{item.sku}</td>
+                        <td>{item.quantityRequired}</td>
+                        <td>{item.availableQuantity}</td>
+                        <td>
+                          {item.isShort ? (
+                            <span className="status-badge failed" style={{ background: 'rgba(239, 68, 68, 0.15)', color: '#f87171', padding: '4px 10px', borderRadius: '4px', fontSize: '12px', fontWeight: 600 }}>
+                              Shortage (-{(item.quantityRequired - item.availableQuantity).toFixed(1)})
+                            </span>
+                          ) : (
+                            <span className="status-badge delivered" style={{ background: 'rgba(16, 185, 129, 0.15)', color: '#34d399', padding: '4px 10px', borderRadius: '4px', fontSize: '12px', fontWeight: 600 }}>
+                              In Stock
+                            </span>
+                          )}
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+
+              {/* Action Buttons */}
+              <div style={{ display: 'flex', gap: '16px', justifyContent: 'flex-end', marginTop: '24px' }}>
+                {selectedRoute.routeStatus === 'PLANNED' && (
+                  <button
+                    className="lp-btn lp-btn--ghost"
+                    disabled={allocating || validationReport.hasShortage || validationReport.items.length === 0}
+                    onClick={handleAllocateStock}
+                    style={{ display: 'flex', alignItems: 'center', gap: '8px', border: '1px solid rgba(255,255,255,0.15)' }}
+                  >
+                    📥 {allocating ? 'Allocating...' : 'Reserve Stock'}
+                  </button>
+                )}
+
+                {selectedRoute.routeStatus === 'PLANNED' && (
+                  <button
+                    className="lp-btn lp-btn--primary"
+                    onClick={handleDispatchRoute}
+                    disabled={validationReport.hasShortage || validationReport.items.length === 0 || validationReport.totalWeightKg > validationReport.vehicleWeightCapacity}
+                    style={{ display: 'flex', alignItems: 'center', gap: '8px' }}
+                  >
+                    🚀 Dispatch (Set Active)
+                  </button>
+                )}
+              </div>
+            </div>
+          ) : (
+            <div style={{ padding: '24px 0', textAlign: 'center', color: 'var(--app-text-3)' }}>
+              Could not retrieve stock status. Please check if items are linked to the route's deliveries.
+            </div>
+          )}
+        </div>
+      )}
 
       <div className="table-container" style={{ marginTop: '24px' }}>
         {loading && <div className="empty-state">Loading routes...</div>}
